@@ -20,7 +20,7 @@ export default {
         : users
             .map(
               (user) =>
-                `<@${user.discordId}> - ASNG: ${user.ASNGUsername} Position: ${user.maxPosition}`,
+                `<@${user.discordId}> - ${user.ASNGUsername} Max: ${user.maxPosition}`,
             )
             .join("\n");
 
