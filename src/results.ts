@@ -65,7 +65,12 @@ async function fetchASNG() {
     startingAt += 20;
   }
 
-  return { contestants, nextThemeName, thisThemeName };
+  return {
+    contestId: thisContestId,
+    contestants,
+    nextThemeName,
+    thisThemeName,
+  };
 }
 
 function generateContent(
@@ -153,7 +158,8 @@ async function postResults(client: Client, content: string) {
 }
 
 export async function fetchPostResults(client: Client) {
-  const { contestants, nextThemeName, thisThemeName } = await fetchASNG();
+  const { contestId, contestants, nextThemeName, thisThemeName } =
+    await fetchASNG();
 
   const users = await prisma.user.findMany();
   const content = generateContent(
@@ -163,5 +169,9 @@ export async function fetchPostResults(client: Client) {
     nextThemeName,
   );
 
-  postResults(client, content);
+  await postResults(client, content);
+
+  await prisma.postedContest.create({
+    data: { contestId, timestamp: new Date() },
+  });
 }

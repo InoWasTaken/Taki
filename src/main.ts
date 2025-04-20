@@ -52,16 +52,33 @@ async function main() {
     }
   });
 
-  client.login(config.DISCORD_TOKEN);
+  await client.login(config.DISCORD_TOKEN);
 
   const job = new CronJob(
     "30 0 3,15 * * *",
-    () => fetchPostResults(client),
+    () => {
+      console.log(`${new Date().toISOString()}: Starting fetchPostResults`);
+      fetchPostResults(client);
+      console.log(`${new Date().toISOString()}: fetchPostResults OK`);
+    },
     null,
     true,
     "Europe/Stockholm",
   );
   console.log("Created cron job");
+
+  // Crash recovery
+  const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
+  const lastContestPosted = await prisma.postedContest.findFirst({
+    where: {
+      timestamp: {
+        gt: twelveHoursAgo,
+      },
+    },
+  });
+  if (lastContestPosted === null) {
+    fetchPostResults(client);
+  }
 }
 
 main()

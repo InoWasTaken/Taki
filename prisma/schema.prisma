@@ -12,3 +12,8 @@ model User {
   ASNGUsername String
   maxPosition  Int    @default(200)
 }
+
+model PostedContest {
+  contestId Int      @id
+  timestamp DateTime
+}
